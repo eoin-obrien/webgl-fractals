@@ -2,6 +2,7 @@ import { ScreenQuad, shaderMaterial } from '@react-three/drei'
 import { extend, useFrame, useThree } from '@react-three/fiber'
 import { FC, useRef } from 'react'
 import { Vector2, Vector2Tuple } from 'three'
+import { glslComplex } from './complex'
 
 const Mandelbrot = shaderMaterial(
   {
@@ -19,6 +20,8 @@ const Mandelbrot = shaderMaterial(
     }
     `,
   /*glsl*/`
+    ${glslComplex}
+
     uniform float time;
     uniform vec2 resolution;
     uniform vec2 center;
@@ -40,11 +43,12 @@ const Mandelbrot = shaderMaterial(
       vec2 z  = vec2(0.0);
       for( int i=0; i<maxIterations; i++ )
       {
-          z = vec2( z.x*z.x - z.y*z.y, 2.0*z.x*z.y ) + c; // z = z² + c
-          if( dot(z,z)>(B*B) ) {
-            return n - log2(log2(dot(z,z))) + 4.0;
-          };
-          n += 1.0;
+        z = c_pow(z, 2.0) + c; // z = z² + c
+          // z = vec2( z.x*z.x - z.y*z.y, 2.0*z.x*z.y ) + c;
+        if( dot(z,z)>(B*B) ) {
+          return n - log2(log2(dot(z,z))) + 4.0;
+        };
+        n += 1.0;
       }
 
       return float(maxIterations);

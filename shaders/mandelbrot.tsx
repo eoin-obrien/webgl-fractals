@@ -71,11 +71,15 @@ const Mandelbrot = shaderMaterial(
             origin.x + (float(i) + 0.5) * subpixel,
             origin.y + (float(j) + 0.5) * subpixel
           ));
-          color += toColor(k);
+
+          // Sum square of RGB values
+          vec3 subpixelColor = toColor(k);
+          color += subpixelColor * subpixelColor;
         }
       }
 
-      color /= pow(float(supersample), 2.0);
+      // Find average RGB from sum of squares
+      color = sqrt(color / pow(float(supersample), 2.0));
 
       gl_FragColor = vec4(color, 1.0);
     }

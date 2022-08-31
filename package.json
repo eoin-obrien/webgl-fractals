@@ -11,6 +11,7 @@
   "dependencies": {
     "@react-three/drei": "^9.24.4",
     "@react-three/fiber": "^8.6.0",
+    "@use-gesture/react": "^10.2.18",
     "leva": "^0.9.30",
     "next": "12.2.5",
     "react": "18.2.0",

@@ -4,7 +4,7 @@ import { FC, useRef } from 'react'
 import { Vector2, Vector2Tuple } from 'three'
 import { glslComplex } from './complex'
 
-const Mandelbrot = shaderMaterial(
+const Julia = shaderMaterial(
   {
     time: 0,
     resolution: new Vector2(),
@@ -12,6 +12,7 @@ const Mandelbrot = shaderMaterial(
     supersample: 1,
     gamma: 1,
     center: new Vector2(),
+    c: new Vector2(),
     zoom: 1
   },
   /*glsl*/`
@@ -25,6 +26,7 @@ const Mandelbrot = shaderMaterial(
     uniform float time;
     uniform vec2 resolution;
     uniform vec2 center;
+    uniform vec2 c;
     uniform float zoom;
     uniform float gamma;
     uniform int maxIterations;
@@ -36,22 +38,10 @@ const Mandelbrot = shaderMaterial(
       return a + b*cos( 6.28318*(c*t+d) );
     }
 
-    float mandelbrot(vec2 c) {
+    float julia(vec2 z) {
       const float B = 256.0;
 
-      // optimize main cardioid
-      float q = pow(c.x - 0.25, 2.0) + pow(c.y, 2.0);
-      if (q * (q + (c.x - 0.25)) < 0.25 * pow(c.y, 2.0)) {
-        return float(maxIterations);
-      }
-
-      // optimize period-2 bulb
-      if (pow(c.x + 1.0, 2.0) + pow(c.y, 2.0) < 0.0625) {
-        return float(maxIterations);
-      }
-
       float n = 0.0;
-      vec2 z  = vec2(0.0);
       for( int i=0; i<maxIterations; i++ )
       {
         z = c_mul(z, z) + c; // z = z² + c
@@ -81,7 +71,7 @@ const Mandelbrot = shaderMaterial(
       vec2 origin = p - 0.5 * scale;
       for (int i = 0; i < supersample; i++) {
         for (int j = 0; j < supersample; j++) {
-          float k = mandelbrot(vec2(
+          float k = julia(vec2(
             origin.x + (float(i) + 0.5) * subpixel,
             origin.y + (float(j) + 0.5) * subpixel
           ));
@@ -100,11 +90,12 @@ const Mandelbrot = shaderMaterial(
     `
 )
 
-extend({ Mandelbrot })
+extend({ Julia })
 
-type MandelbrotImpl = {
+type JuliaImpl = {
   resolution: Vector2Tuple
   center?: Vector2Tuple
+  c?: Vector2Tuple
   zoom?: number
   gamma?: number
   maxIterations?: number
@@ -114,17 +105,17 @@ type MandelbrotImpl = {
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      mandelbrot: MandelbrotImpl
+      julia: JuliaImpl
     }
   }
 }
 
-interface MandelbrotSceneProps extends Partial<MandelbrotImpl> {}
+interface JuliaSceneProps extends Partial<JuliaImpl> {}
 
-export const MandelbrotScene: FC<MandelbrotSceneProps> = (props) => {
+export const JuliaScene: FC<JuliaSceneProps> = (props) => {
   const size = useThree((state) => state.size);
   const dpr = useThree((state) => state.viewport.dpr);
-  const ref = useRef<MandelbrotImpl>(null!)
+  const ref = useRef<JuliaImpl>(null!)
   useFrame((state) => {
     if (ref.current.uniforms) {
       ref.current.uniforms.time.value = state.clock.elapsedTime
@@ -133,7 +124,7 @@ export const MandelbrotScene: FC<MandelbrotSceneProps> = (props) => {
 
   return (
     <ScreenQuad>
-      <mandelbrot
+      <julia
         ref={ref as any}
         {...props}
         resolution={[size.width * dpr, size.height * dpr]} />

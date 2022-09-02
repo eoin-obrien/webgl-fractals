@@ -1,11 +1,11 @@
 import { Canvas } from '@react-three/fiber'
 import { useGesture } from '@use-gesture/react'
-import { button, useControls } from 'leva'
+import { useControls } from 'leva'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { Ref, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Vector2Tuple } from 'three'
-import { MandelbrotScene } from '../shaders/mandelbrot'
+import { JuliaScene } from '../shaders/julia'
 
 const zoomFactor = 1.1;
 
@@ -18,28 +18,39 @@ const translate = (point: Vector2Tuple, delta: Vector2Tuple, scale: number): Vec
   return [point[0] - scaledDelta[0], point[1] + scaledDelta[1]];
 }
 
-const saveCanvas = (canvas: HTMLCanvasElement, title: string) => {
-  const link = document.createElement("a");
-	link.download = title;
-	link.href = canvas.toDataURL();
+const parseQueryFloat = (str?: string | string[]): number => {
+  if (!str || !str.length) {
+    return 0;
+  }
 
-	document.body.appendChild(link);
-	link.click();
-
-  document.body.removeChild(link);
+  const float = parseFloat(Array.isArray(str) ? str[0] : str);
+  return isNaN(float) ? 0 : float;
 }
 
-const MandelbrotPage: NextPage = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [center, setCenter] = useState<[x: number, y: number]>([-0.5, 0]);
-  const [zoom, setZoom] = useState(0.3);
+const JuliaPage: NextPage = () => {
   const router = useRouter();
+  console.log(router.query)
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [center, setCenter] = useState<[x: number, y: number]>([0, 0]);
+  const [c, setC] = useState<[x: number, y: number]>([0,0]);
+  const [zoom, setZoom] = useState(0.3);
+
+  useEffect(() => {
+    setC([parseQueryFloat(router.query.cx), parseQueryFloat(router.query.cy)])
+  }, [router.query.cx, router.query.cy])
+
+  console.log(c);
+
   const bind = useGesture({
-    onDrag: ({ active, delta }) => {
+    onDrag: ({ active, delta, event }) => {
       if (canvasRef.current && active) {
         const { width, height } = canvasRef.current;
         const scale = getScale([width, height], zoom);
-        setCenter(translate(center, delta, scale));
+        if (event.ctrlKey) {
+          setC(translate(c, delta, scale));
+        } else {
+          setCenter(translate(center, delta, scale));
+        }
       }
     },
     onWheel: ({ active, direction, event }) => {
@@ -58,28 +69,17 @@ const MandelbrotPage: NextPage = () => {
         setZoom(newZoom)
       }
     },
-    onDoubleClick: ({ event }) => {
-      if (canvasRef.current) {
-        const { width, height } = canvasRef.current;
-        const scale = getScale([width, height], zoom);
-        const delta = [event.clientX - width / 2, event.clientY - height / 2];
-        const scaledDelta = delta.map(value => value * scale);
-        const c = [scaledDelta[0] + center[0], scaledDelta[1] + center[1]];
-        window.open(`/julia?cx=${c[0]}&cy=${c[1]}`, '_blank')
-      }
-    }
   });
   const controls = useControls({
-    gamma: { value: 0.2, step: 0.001 },
-    maxIterations: { value: 100, min: 1, step: 1 },
+    gamma: 0.2,
+    maxIterations: 100,
     supersample: { value: 2, min: 1, max: 16, step: 1 },
-    save: button((get) => saveCanvas(canvasRef.current!, `Mandelbrot (${center[0]},${center[1]}).png`)),
   })
   return (
-    <Canvas ref={canvasRef} linear flat frameloop='demand' gl={{ preserveDrawingBuffer: true }} style={{ touchAction: 'none' }} {...bind()}>
-      <MandelbrotScene {...controls} zoom={zoom} center={center} />
+    <Canvas ref={canvasRef} linear flat frameloop='demand' style={{ touchAction: 'none' }} {...bind()}>
+      <JuliaScene {...controls} zoom={zoom} center={center} c={c} />
     </Canvas>
   )
 }
 
-export default MandelbrotPage
+export default JuliaPage

@@ -1,16 +1,16 @@
-import { ScreenQuad, shaderMaterial } from '@react-three/drei'
-import { extend, useFrame, useThree } from '@react-three/fiber'
-import { FC, useRef } from 'react'
-import { Vector2, Vector2Tuple } from 'three'
-import { glslComplex } from './complex'
-import { baseFragmentShader, baseUniforms, baseVertexShader } from './utils'
+import { ScreenQuad, shaderMaterial } from "@react-three/drei";
+import { extend, useFrame, useThree } from "@react-three/fiber";
+import { FC, useRef } from "react";
+import { Vector2, Vector2Tuple } from "three";
+import { glslComplex } from "./complex";
+import { baseFragmentShader, baseUniforms, baseVertexShader } from "./utils";
 
 const Mandelbrot = shaderMaterial(
   {
-    ...baseUniforms
+    ...baseUniforms,
   },
   baseVertexShader,
-  /*glsl*/`
+  /*glsl*/ `
     ${baseFragmentShader}
 
     float render(vec2 c) {
@@ -49,16 +49,17 @@ const Mandelbrot = shaderMaterial(
       return -1.0;
     }
     `
-)
+);
 
-extend({ Mandelbrot })
+extend({ Mandelbrot });
 
-type MandelbrotImpl = Partial<typeof baseUniforms> & JSX.IntrinsicElements['shaderMaterial']
+type MandelbrotImpl = Partial<typeof baseUniforms> &
+  JSX.IntrinsicElements["shaderMaterial"];
 
 declare global {
   namespace JSX {
     interface IntrinsicElements {
-      mandelbrot: MandelbrotImpl
+      mandelbrot: MandelbrotImpl;
     }
   }
 }
@@ -68,14 +69,15 @@ interface MandelbrotSceneProps extends Partial<MandelbrotImpl> {}
 export const MandelbrotScene: FC<MandelbrotSceneProps> = (props) => {
   const size = useThree((state) => state.size);
   const dpr = useThree((state) => state.viewport.dpr);
-  const ref = useRef<MandelbrotImpl>(null!)
+  const ref = useRef<MandelbrotImpl>(null!);
 
   return (
     <ScreenQuad>
       <mandelbrot
         ref={ref as any}
         {...props}
-        resolution={[size.width * dpr, size.height * dpr]} />
+        resolution={[size.width * dpr, size.height * dpr]}
+      />
     </ScreenQuad>
   );
-}
+};

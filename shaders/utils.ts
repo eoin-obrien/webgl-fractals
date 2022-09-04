@@ -16,16 +16,16 @@ export const baseUniforms = {
   paletteA: [0.5, 0.5, 0.5] as Vector3Tuple,
   paletteB: [0.5, 0.5, 0.5] as Vector3Tuple,
   paletteC: [1.0, 1.0, 1.0] as Vector3Tuple,
-  paletteD: [0.20, 0.10, 0.00] as Vector3Tuple,
-}
+  paletteD: [0.2, 0.1, 0.0] as Vector3Tuple,
+};
 
-export const baseVertexShader = /*glsl*/`
+export const baseVertexShader = /*glsl*/ `
   void main() {
     gl_Position = vec4(position, 1.0);
   }
-  `
+  `;
 
-export const baseFragmentShader =  /*glsl*/`
+export const baseFragmentShader = /*glsl*/ `
   ${glslComplex}
 
   uniform vec2 resolution;
@@ -86,4 +86,4 @@ export const baseFragmentShader =  /*glsl*/`
 
     gl_FragColor = vec4(color, 1.0);
   }
-  `
+  `;

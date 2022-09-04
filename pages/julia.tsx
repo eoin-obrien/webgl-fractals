@@ -77,7 +77,7 @@ const JuliaPage: NextPage = () => {
   })
   return (
     <Canvas ref={canvasRef} linear flat frameloop='demand' style={{ touchAction: 'none' }} {...bind()}>
-      <JuliaScene {...controls} zoom={zoom} center={center} c={c} />
+      <JuliaScene {...controls} zoom={zoom} center={center} parameter={c} />
     </Canvas>
   )
 }

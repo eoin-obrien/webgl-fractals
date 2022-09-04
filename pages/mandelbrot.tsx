@@ -20,26 +20,36 @@ const translate = (point: Vector2Tuple, delta: Vector2Tuple, scale: number): Vec
 
 const saveCanvas = (canvas: HTMLCanvasElement, title: string) => {
   const link = document.createElement("a");
-	link.download = title;
-	link.href = canvas.toDataURL();
+  link.download = title;
+  link.href = canvas.toDataURL();
 
-	document.body.appendChild(link);
-	link.click();
+  document.body.appendChild(link);
+  link.click();
 
   document.body.removeChild(link);
 }
 
 const MandelbrotPage: NextPage = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [center, setCenter] = useState<[x: number, y: number]>([-0.5, 0]);
-  const [zoom, setZoom] = useState(0.3);
-  const router = useRouter();
+  const [controls, set] = useControls(() => ({
+    parameter: [0, 0],
+    center: [-0.5, 0],
+    exponent: { value: 2.0, min: 1.0 },
+    bailout: { value: 256, min: 0 },
+    zoom: 0.3,
+    paletteOffset: { value: 0, min: 0, max: 1 },
+    gamma: { value: 0.2, step: 0.001 },
+    maxIterations: { value: 100, min: 1, step: 1 },
+    supersample: { value: 2, min: 1, max: 16, step: 1 },
+    save: button((get) => saveCanvas(canvasRef.current!, `Mandelbrot (${get('center')[0]},${get('center')[1]}).png`)),
+  }));
+  const { center, zoom } = controls
   const bind = useGesture({
     onDrag: ({ active, delta }) => {
       if (canvasRef.current && active) {
         const { width, height } = canvasRef.current;
         const scale = getScale([width, height], zoom);
-        setCenter(translate(center, delta, scale));
+        set({ center: translate(center, delta, scale) });
       }
     },
     onWheel: ({ active, direction, event }) => {
@@ -48,14 +58,11 @@ const MandelbrotPage: NextPage = () => {
         const newZoom = direction[1] < 0 ? zoom * zoomFactor : zoom / zoomFactor;
 
         // Keep pixel under pointer steady while zooming
-        const delta: Vector2Tuple = [event.clientX - width / 2, event.clientY - height / 2];
-        const x = delta[0] * (1 - (newZoom / zoom));
-        const y = delta[1] * (1 - (newZoom / zoom));
+        const pixelDelta: Vector2Tuple = [event.clientX - width / 2, event.clientY - height / 2];
+        const delta = pixelDelta.map(value => value * (1 - (newZoom / zoom))) as Vector2Tuple
         const scale = getScale([width, height], newZoom)
-        const newCenter = translate(center, [x, y], scale)
 
-        setCenter(newCenter)
-        setZoom(newZoom)
+        set({ center: translate(center, delta, scale), zoom: newZoom })
       }
     },
     onDoubleClick: ({ event }) => {
@@ -69,14 +76,8 @@ const MandelbrotPage: NextPage = () => {
       }
     }
   });
-  const controls = useControls({
-    gamma: { value: 0.2, step: 0.001 },
-    maxIterations: { value: 100, min: 1, step: 1 },
-    supersample: { value: 2, min: 1, max: 16, step: 1 },
-    save: button((get) => saveCanvas(canvasRef.current!, `Mandelbrot (${center[0]},${center[1]}).png`)),
-  })
   return (
-    <Canvas ref={canvasRef} linear flat frameloop='demand' gl={{ preserveDrawingBuffer: true }} style={{ touchAction: 'none' }} {...bind()}>
+    <Canvas ref={canvasRef} linear flat frameloop='demand' gl={{ precision: 'highp', preserveDrawingBuffer: true }} style={{ touchAction: 'none' }} {...bind()}>
       <MandelbrotScene {...controls} zoom={zoom} center={center} />
     </Canvas>
   )

@@ -13,11 +13,12 @@ const Mandelbrot = shaderMaterial(
   /*glsl*/ `
     ${baseFragmentShader}
 
-    float render(vec2 c) {
-      const float B = 256.0;
+    float render(vec2 point) {
+      vec2 c = isJulia ? parameter : point;
+      vec2 z = isJulia ? point : parameter;
 
       // Optimizations for z0 = 0 + 0i only
-      if (parameter == vec2(0.0, 0.0) && exponent == 2.0) {
+      if (!isJulia && parameter == vec2(0.0, 0.0) && exponent == 2.0) {
         // optimize main cardioid
         float q = pow(c.x - 0.25, 2.0) + pow(c.y, 2.0);
         if (q * (q + (c.x - 0.25)) < 0.25 * pow(c.y, 2.0)) {
@@ -31,11 +32,10 @@ const Mandelbrot = shaderMaterial(
       }
 
       float n = 0.0;
-      vec2 z  = parameter;
       for( int i=0; i<maxIterations; i++ )
       {
         z = c_pow(z, exponent) + c;
-        if( dot(z,z)>(B*B) ) {
+        if( length(z) > bailout ) {
           if (exponent == 2.0) {
             // Optimized for z = z² + c
             return n - log2(log2(dot(z,z))) + 4.0;

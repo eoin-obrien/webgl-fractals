@@ -11,6 +11,7 @@ export const baseUniforms = {
   bailout: 256,
   maxIterations: 1000,
   supersample: 1,
+  isJulia: false,
 
   paletteOffset: 0,
   paletteA: [0.5, 0.5, 0.5] as Vector3Tuple,
@@ -37,6 +38,7 @@ export const baseFragmentShader = /*glsl*/ `
   uniform float bailout;
   uniform int maxIterations;
   uniform int supersample;
+  uniform bool isJulia;
 
   uniform float paletteOffset;
   uniform vec3 paletteA;

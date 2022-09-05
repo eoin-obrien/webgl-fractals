@@ -20,18 +20,25 @@ const MagnetType1 = shaderMaterial(
     float render(vec2 point) {
       vec2 c = isJulia ? parameter : point;
       vec2 z = isJulia ? point : parameter;
+      vec2 z_prev;
 
-      float n = 0.0;
+      float n_divergent = 0.0;
+      float n_convergent = 0.0;
       for( int i=0; i<maxIterations; i++ )
       {
+        z_prev = z;
         z = c_pow(c_div(
           c_pow(z, 2.0) + c - c_one(),
           2.0 * z + c - 2.0 * c_one()
         ), exponent);
-        if( length(z) > bailout || c_eq(z, c_one(), epsilon) ) {
-          return n;
-        };
-        n += 1.0;
+        if ( length(z) > bailout ) {
+          return n_divergent;
+        }
+        if ( c_eq(z, c_one(), epsilon) ) {
+          return n_convergent;
+        }
+        n_divergent += exp(-length(z));
+        n_convergent += exp(-length(c_div(c_one(), z_prev - z)));
       }
 
       return -1.0;

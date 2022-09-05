@@ -27,10 +27,10 @@ interface NamedFractal {
 }
 
 const fractalOptions: Record<string, NamedFractal> = {
+  MagnetType1: { name: "MagnetType1", fractal: MagnetType1Scene },
   Mandelbrot: { name: "Mandelbrot", fractal: MandelbrotScene },
   BurningShip: { name: "BurningShip", fractal: BurningShipScene },
   Tricorn: { name: "Tricorn", fractal: TricornScene },
-  MagnetType1: { name: "MagnetType1", fractal: MagnetType1Scene },
   MagnetType2: { name: "MagnetType2", fractal: MagnetType2Scene },
 };
 

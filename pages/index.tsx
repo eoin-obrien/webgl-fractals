@@ -2,18 +2,14 @@ import { Canvas } from "@react-three/fiber";
 import { useGesture } from "@use-gesture/react";
 import { button, Leva, useControls } from "leva";
 import type { NextPage } from "next";
-import { useRouter } from "next/router";
-import { Component, FunctionComponent, Ref, useRef, useState } from "react";
+import { FunctionComponent, useRef } from "react";
 import { Vector2Tuple } from "three";
-import { MandelbrotScene } from "../shaders/mandelbrot";
+import { BurningShipScene } from "../components/BurningShipScene";
+import { MandelbrotScene } from "../components/MandelbrotScene";
+import { TricornScene } from "../components/TricornScene";
 import { baseUniforms } from "../shaders/utils";
 import { downloadCanvas } from "../utils/canvas";
-import {
-  getScale,
-  translate,
-  deltaFromEvent,
-  scalePoint,
-} from "../utils/point";
+import { deltaFromEvent, getScale, translate } from "../utils/point";
 
 const zoomFactor = 1.1;
 
@@ -30,6 +26,8 @@ interface NamedFractal {
 
 const fractalOptions: Record<string, NamedFractal> = {
   Mandelbrot: { name: "Mandelbrot", fractal: MandelbrotScene },
+  BurningShip: { name: "BurningShip", fractal: BurningShipScene },
+  Tricorn: { name: "Tricorn", fractal: TricornScene },
 };
 
 const FractalPage: NextPage = () => {
@@ -46,7 +44,7 @@ const FractalPage: NextPage = () => {
     supersample: { value: 2, min: 1, max: 16, step: 1 },
     save: button((get) => {
       const key = get("julia") ? "julia" : "mandelbrot";
-      let name = get("fractal").name;
+      let name = get("algorithm").name;
       if (get("isJulia")) {
         name += " Julia";
       }
@@ -54,7 +52,7 @@ const FractalPage: NextPage = () => {
       const parameter = `(${get("parameter")[0]},${get("parameter")[1]})`;
       return downloadCanvas(
         canvasRef.current!,
-        `${name} ${parameter} ${center}.png`
+        `${name} exp=${get("exponent")} param=${parameter} ${center}.png`
       );
     }),
   }));

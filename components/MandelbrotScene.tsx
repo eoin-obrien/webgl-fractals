@@ -2,8 +2,12 @@ import { ScreenQuad, shaderMaterial } from "@react-three/drei";
 import { extend, useFrame, useThree } from "@react-three/fiber";
 import { FC, useRef } from "react";
 import { Vector2, Vector2Tuple } from "three";
-import { glslComplex } from "./complex";
-import { baseFragmentShader, baseUniforms, baseVertexShader } from "./utils";
+import { glslComplex } from "../shaders/complex";
+import {
+  baseFragmentShader,
+  baseUniforms,
+  baseVertexShader,
+} from "../shaders/utils";
 
 const Mandelbrot = shaderMaterial(
   {

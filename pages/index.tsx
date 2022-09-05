@@ -5,6 +5,8 @@ import type { NextPage } from "next";
 import { FunctionComponent, useRef } from "react";
 import { Vector2Tuple } from "three";
 import { BurningShipScene } from "../components/BurningShipScene";
+import { MagnetType1Scene } from "../components/MagnetType1Scene";
+import { MagnetType2Scene } from "../components/MagnetType2Scene";
 import { MandelbrotScene } from "../components/MandelbrotScene";
 import { TricornScene } from "../components/TricornScene";
 import { baseUniforms } from "../shaders/utils";
@@ -28,6 +30,8 @@ const fractalOptions: Record<string, NamedFractal> = {
   Mandelbrot: { name: "Mandelbrot", fractal: MandelbrotScene },
   BurningShip: { name: "BurningShip", fractal: BurningShipScene },
   Tricorn: { name: "Tricorn", fractal: TricornScene },
+  MagnetType1: { name: "MagnetType1", fractal: MagnetType1Scene },
+  MagnetType2: { name: "MagnetType2", fractal: MagnetType2Scene },
 };
 
 const FractalPage: NextPage = () => {

@@ -9,6 +9,7 @@ export const baseUniforms = {
   zoom: 1,
   gamma: 1,
   bailout: 256,
+  epsilon: 0.001,
   maxIterations: 1000,
   supersample: 1,
   isJulia: false,
@@ -36,6 +37,7 @@ export const baseFragmentShader = /*glsl*/ `
   uniform float zoom;
   uniform float gamma;
   uniform float bailout;
+  uniform float epsilon;
   uniform int maxIterations;
   uniform int supersample;
   uniform bool isJulia;

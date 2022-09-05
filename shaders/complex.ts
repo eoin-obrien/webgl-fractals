@@ -186,4 +186,9 @@ vec2 c_inv(vec2 c) {
   float norm = length(c);
 	return vec2(c.x, -c.y) / (norm * norm);
 }
+
+bool c_eq(vec2 a, vec2 b, float epsilon) {
+  float diff = length(a - b);
+  return diff < epsilon;
+}
 `;

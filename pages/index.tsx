@@ -27,10 +27,10 @@ interface NamedFractal {
 }
 
 const fractalOptions: Record<string, NamedFractal> = {
-  MagnetType1: { name: "MagnetType1", fractal: MagnetType1Scene },
   Mandelbrot: { name: "Mandelbrot", fractal: MandelbrotScene },
   BurningShip: { name: "BurningShip", fractal: BurningShipScene },
   Tricorn: { name: "Tricorn", fractal: TricornScene },
+  MagnetType1: { name: "MagnetType1", fractal: MagnetType1Scene },
   MagnetType2: { name: "MagnetType2", fractal: MagnetType2Scene },
 };
 
@@ -76,6 +76,7 @@ const FractalPage: NextPage = () => {
   );
 
   const bind = useGesture({
+    // @ts-ignore
     onDrag: ({ active, delta, ctrlKey }) => {
       // Convert delta from screen axes to complex plane
       delta[0] *= -1;
@@ -89,6 +90,7 @@ const FractalPage: NextPage = () => {
         }
       }
     },
+    // @ts-ignore
     onWheel: ({ active, direction, event }) => {
       if (canvasRef.current && active && direction[1] !== 0) {
         const { width, height } = canvasRef.current;
